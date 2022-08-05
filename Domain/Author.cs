@@ -12,6 +12,7 @@ namespace Bookify.Domain.Model
         {
             this.name = name;
             this.description = description;
+            this.books = new List<Book>();
         }
     }
 }

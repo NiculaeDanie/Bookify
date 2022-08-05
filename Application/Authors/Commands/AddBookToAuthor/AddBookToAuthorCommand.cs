@@ -11,6 +11,6 @@ namespace Application.Authors.Commands.AddBookToAuthor
     public class AddBookToAuthorCommand: IRequest<int>
     {
         public int Id { get; set; }
-        public Book book { get; set; }
+        public int bookId { get; set; }
     }
 }
