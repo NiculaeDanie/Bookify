@@ -11,6 +11,7 @@ namespace Application
     {
         void CreateUser(User user);
         void AddBookToHistory(int id, Book book);
-
+        int VerifyUser(string email, string password);
+        IEnumerable<Book> GetHistory(int id);
     }
 }

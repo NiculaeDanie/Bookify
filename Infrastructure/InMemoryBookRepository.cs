@@ -32,5 +32,10 @@ namespace Infrastructure
             var book = _book.FirstOrDefault(b => b.id==id);
             book.status = (Status)1;
         }
+        public string GetContent(int id)
+        {
+            var book = _book.FirstOrDefault(b => b.id == id);
+            return book.content;
+        }
     }
 }

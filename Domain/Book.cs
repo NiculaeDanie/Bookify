@@ -23,7 +23,10 @@ namespace Bookify.Domain.Model
             this.genre = genre;
             this.content = content;
         }
-
+        public void PublishBook()
+        {
+            this.status = (Status)1;
+        }
     }
 
     public enum Status

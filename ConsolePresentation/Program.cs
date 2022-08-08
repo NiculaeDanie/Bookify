@@ -3,6 +3,10 @@ using Application.Authors.Commands.AddBookToAuthor;
 using Application.Authors.Commands.CreateAuthor;
 using Application.Authors.Queries.GetAuthorList;
 using Application.Books.Commands.CreateBook;
+using Application.Users.Commands.CreateUser;
+using Application.Users.Queries.GetBookContent;
+using Application.Users.Queries.GetUserHistory;
+using Application.Users.Queries.VerifyUser;
 using Infrastructure;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,4 +50,33 @@ var authors = await mediator.Send(new GetAuthorListQuery());
 foreach(var author in authors)
 {
     Console.WriteLine(author.name);
+}
+
+await mediator.Send(new CreateUserCommand
+{
+    email = "test",
+    password = "test",
+    name = "test"
+});
+
+var user = await mediator.Send(new VerifyUserQuery
+{
+    email = "test",
+    password = "test"
+});
+
+var bookContent=await mediator.Send(new GetBookContentQuery
+{
+    userId = user,
+    bookId = bookId
+});
+Console.WriteLine(bookContent);
+var userHistory = await mediator.Send(new GetUserHistoryQuery
+{
+    userId = user
+});
+Console.WriteLine("User history");
+foreach(var book in userHistory)
+{
+    Console.WriteLine(book.title);
 }

@@ -20,6 +20,7 @@ namespace Application.Authors.Queries.GetAuthorById
             var author = _repository.GetAuthor(request.id);
             var result =new AuthorVm
             {
+                Id = author.id,
                 name = author.name,
                 description = author.description,
                 books = author.books.Select(item => new BookListDto

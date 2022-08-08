@@ -19,17 +19,19 @@ namespace Application.Authors.Queries.GetAuthorList
         {
             var result = _repository.GetAuthors().Select(author => new AuthorListVm
             {
+                Id = author.id,
                 name = author.name,
                 description = author.description,
                 books = author.books.Select(item => new BookListDto
                 {
+                    id = item.id,
                     title = item.title,
                     date = item.releaseDate,
                     description = item.descriprion,
                     status = item.status,
                     genre = item.genre
                 }).ToList()
-            }) ;
+            }) ; 
             return Task.FromResult(result);
         }
     }

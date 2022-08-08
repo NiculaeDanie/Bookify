@@ -13,5 +13,6 @@ namespace Application
         Book GetBook(int id);
         IEnumerable<Book> GetAllBooks();
         void PublishBook(int id);
+        string GetContent(int id);
     }
 }

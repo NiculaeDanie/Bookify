@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Books.Commands.PublishBook
+namespace Application.Users.Queries.GetBookContent
 {
-    public class PublishBookCommand: IRequest<int>
+    public class GetBookContentQuery: IRequest<string>
     {
+        public int userId { get; set; }
         public int bookId { get; set; }
     }
 }

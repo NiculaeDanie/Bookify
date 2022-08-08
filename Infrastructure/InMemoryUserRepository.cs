@@ -22,5 +22,16 @@ namespace Infrastructure
             _user.Add(user);
             user.id = _user.Count();
         }
+        public int VerifyUser(string email, string password)
+        {
+            var user = _user.First(u=> (u.email == email) && (u.password==password));
+
+            return user.id;
+        }
+        public IEnumerable<Book> GetHistory(int id)
+        {
+            var user = _user.FirstOrDefault(u => u.id == id);
+            return user.history;
+        }
     }
 }
