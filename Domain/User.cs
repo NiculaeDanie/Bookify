@@ -24,5 +24,21 @@ namespace Bookify.Domain.Model
             this.name = name;
             this.history = new List<Book>();
         }
+        public List<string> GetUserPreferences()
+        {
+            List<string> genre = new List<string>();
+            foreach (var o in history)
+            {
+                foreach (var i in o.genre)
+                {
+                    genre.Add(i);
+                }
+            }
+            var resunt = from c in genre
+                         group c by c into p
+                         orderby p.Count() descending
+                         select p.Key;
+            return resunt.ToList();
+        }
     }
 }

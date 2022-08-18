@@ -6,6 +6,7 @@ using Application.Books.Commands.CreateBook;
 using Application.Users.Commands.CreateUser;
 using Application.Users.Queries.GetBookContent;
 using Application.Users.Queries.GetUserHistory;
+using Application.Users.Queries.GetUserPreferences;
 using Application.Users.Queries.VerifyUser;
 using Infrastructure;
 using MediatR;
@@ -71,12 +72,12 @@ var bookContent=await mediator.Send(new GetBookContentQuery
     bookId = bookId
 });
 Console.WriteLine(bookContent);
-var userHistory = await mediator.Send(new GetUserHistoryQuery
+var userHistory = await mediator.Send(new GetUserPreferencesQuery
 {
-    userId = user
+    UserId = user
 });
 Console.WriteLine("User history");
-foreach(var book in userHistory)
+foreach (var book in userHistory)
 {
-    Console.WriteLine(book.title);
+    Console.WriteLine(book);
 }

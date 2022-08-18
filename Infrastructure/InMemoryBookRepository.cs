@@ -30,7 +30,7 @@ namespace Infrastructure
         public void PublishBook(int id)
         {
             var book = _book.FirstOrDefault(b => b.id==id);
-            book.status = (Status)1;
+            book.PublishBook();
         }
         public string GetContent(int id)
         {

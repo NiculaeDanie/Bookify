@@ -13,5 +13,6 @@ namespace Application
         void AddBookToHistory(int id, Book book);
         int VerifyUser(string email, string password);
         IEnumerable<Book> GetHistory(int id);
+        User GetUser(int id);
     }
 }

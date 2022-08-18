@@ -1,11 +1,9 @@
 ﻿
 
-using Domain.Design_Patterns;
-
 namespace Bookify.Domain.Model
 {
 
-    public class Book: IBook
+    public class Book
     {
         public int id { get; set; }
         public string title { get; set; }
@@ -19,6 +17,11 @@ namespace Bookify.Domain.Model
         public Book()
         {
 
+        }
+        public Book(string title,List<string> genre)
+        {
+            this.title = title;
+            this.genre = genre;
         }
         public Book(string title, List<Author> author, DateTime releaseDate, string descriprion, List<string> genre,string content)
         {

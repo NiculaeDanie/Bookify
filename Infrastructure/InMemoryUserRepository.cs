@@ -33,5 +33,10 @@ namespace Infrastructure
             var user = _user.FirstOrDefault(u => u.id == id);
             return user.history;
         }
+        public User GetUser(int id)
+        {
+            var user = _user.FirstOrDefault(u => u.id == id);
+            return user;
+        }
     }
 }
