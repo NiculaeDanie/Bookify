@@ -1,4 +1,5 @@
 ﻿using Bookify.Domain.Model;
+
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,20 +9,11 @@ using System.Threading.Tasks;
 
 namespace Application.Users.Commands.CreateUser
 {
-    public class CreateUserCommandHandler: IRequestHandler<CreateUserCommand,int>
+    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, User>
     {
-        private readonly IUserRepository _userRepository;
-        public CreateUserCommandHandler(IUserRepository userRepository)
+        public Task<User> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
-            _userRepository = userRepository;
-        }
-
-        public Task<int> Handle(CreateUserCommand command, CancellationToken cancellationToken)
-        {
-            var user = new User(command.email,command.password,command.name);
-            _userRepository.CreateUser(user);
-
-            return Task.FromResult(user.id);
+            throw new NotImplementedException();
         }
     }
 }

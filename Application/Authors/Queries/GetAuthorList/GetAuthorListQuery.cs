@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Bookify.Domain.Model;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Authors.Queries.GetAuthorList
 {
-    public class GetAuthorListQuery: IRequest<IEnumerable<AuthorListVm>>
+    public class GetAuthorListQuery: IRequest<List<Author>>
     {
     }
 }

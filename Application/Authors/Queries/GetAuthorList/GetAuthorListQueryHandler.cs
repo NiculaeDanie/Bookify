@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿using Application.Abstract;
+using Bookify.Domain.Model;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,32 +10,17 @@ using System.Threading.Tasks;
 
 namespace Application.Authors.Queries.GetAuthorList
 {
-    public class GetAuthorListQueryHandler: IRequestHandler<GetAuthorListQuery,IEnumerable<AuthorListVm>>
+    public class GetAuthorListQueryHandler: IRequestHandler<GetAuthorListQuery,List<Author>>
     {
-        private readonly IAuthorRepository _repository;
-        public GetAuthorListQueryHandler(IAuthorRepository repository)
+        private readonly IUnitOfWork _unitOfWork;
+        public GetAuthorListQueryHandler(IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
 
-        public Task<IEnumerable<AuthorListVm>> Handle(GetAuthorListQuery request, CancellationToken cancellationToken)
+        public async Task<List<Author>> Handle(GetAuthorListQuery request, CancellationToken cancellationToken)
         {
-            var result = _repository.GetAuthors().Select(author => new AuthorListVm
-            {
-                Id = author.id,
-                name = author.name,
-                description = author.description,
-                books = author.books.Select(item => new BookListDto
-                {
-                    id = item.id,
-                    title = item.title,
-                    date = item.releaseDate,
-                    description = item.descriprion,
-                    status = item.status,
-                    genre = item.genre
-                }).ToList()
-            }) ; 
-            return Task.FromResult(result);
+            return await _unitOfWork.AuthorRepository.GetAll();
         }
     }
 }

@@ -1,46 +1,59 @@
 ﻿
 
+using Domain;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
+
 namespace Bookify.Domain.Model
 {
 
     public class Book
     {
-        public int id { get; set; }
-        public string title { get; set; }
-        private List<Author> author { get; set; }
-        public DateTime releaseDate { get; set; }
-        public string descriprion { get; set; }
-        public Status status { get; set; }
-        public List<string> genre { get; set; } 
-        public string content { get; set; }
+
+        public int Id { get; set; }
+        public string Title { get; set; }
+        private ICollection<AuthorBook> AuthorBook { get; set; }
+        public DateTime ReleaseDate { get; set; }
+        public string Description { get; set; }
+        public Status Status { get; set; }
+        public ICollection<BookGenre> BookGenre { get; set; } 
+        public ICollection<UserBook> UserBook { get; set; }
+        public int ViewCount { get; set; }
+        public byte[] Content { get; set; }
 
         public Book()
         {
 
         }
-        public Book(string title,List<string> genre)
+        public Book(string title)
         {
-            this.title = title;
-            this.genre = genre;
+            this.Title = title;
         }
-        public Book(string title, List<Author> author, DateTime releaseDate, string descriprion, List<string> genre,string content)
+        public Book(string title, DateTime releaseDate, string descriprion,byte[] content)
         {
-            this.title = title;
-            this.author = author;
-            this.releaseDate = releaseDate;
-            this.descriprion = descriprion;
-            this.status = (Status)1;
-            this.genre = genre;
-            this.content = content;
+            this.Title = title;
+            this.ReleaseDate = releaseDate;
+            this.Description = descriprion;
+            this.Status = (Status)1;
+            this.Content = content;
         }
+
+
         public void PublishBook()
         {
-            this.status = (Status)1;
+            this.Status = (Status)1;
         }
 
         public void DisplayContents()
         {
-            Console.WriteLine(this.content);
+            Console.WriteLine(this.Content);
+        }
+
+        public IFormFile GetContent()
+        {
+            var stream = new MemoryStream(this.Content);
+            IFormFile file = new FormFile(stream, 0, stream.Length, Title, Title);
+            return file;
         }
     }
 

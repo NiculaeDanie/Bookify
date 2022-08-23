@@ -1,4 +1,5 @@
-﻿using Bookify.Domain.Model;
+﻿using Application.Abstract;
+using Bookify.Domain.Model;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,27 +9,31 @@ using System.Threading.Tasks;
 
 namespace Application.Books.Commands.CreateBook
 {
-    public class CreateBookCommandHandler: IRequestHandler<CreateBookCommand,int>
+    public class CreateBookCommandHandler: IRequestHandler<CreateBookCommand,Book>
     {
-        private readonly IBookRepository _bookRepository;
-        private readonly IAuthorRepository _authorRepository;
-        public CreateBookCommandHandler(IBookRepository bookRepository, IAuthorRepository authorRepository)
+        private readonly IUnitOfWork _unitOfWork;
+        public CreateBookCommandHandler(IUnitOfWork unitOfWork)
         {
-            _bookRepository = bookRepository;
-            _authorRepository = authorRepository;
+            _unitOfWork = unitOfWork;
         }
 
-        public Task<int> Handle(CreateBookCommand request, CancellationToken cancellationToken)
+        public async Task<Book> Handle(CreateBookCommand request, CancellationToken cancellationToken)
         {
-            List<Author> authorList = new List<Author>();
-            foreach(var id in request.authorId)
+            await using var memoryStream = new MemoryStream();
+            await request.Content.CopyToAsync(memoryStream);
+            var content = memoryStream.ToArray();
+            var Book = new Book
             {
-                authorList.Add(_authorRepository.GetAuthor(id));
-            }
-            var book = new Book(request.title, authorList, request.releaseDate, request.description, request.genre, request.content);
-            _bookRepository.CreateBook(book);
-            return Task.FromResult(book.id);
-
+                Title = request.Title,
+                Description = request.Description,
+                ReleaseDate = request.ReleaseDate,
+                Status= 0,
+                ViewCount=0,
+                Content= content
+            };
+            await _unitOfWork.BookRepository.Add(Book);
+            await _unitOfWork.Save();
+            return Book;
         }
     }
 }

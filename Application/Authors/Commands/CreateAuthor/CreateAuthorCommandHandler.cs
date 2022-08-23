@@ -1,4 +1,5 @@
-﻿using Bookify.Domain.Model;
+﻿using Application.Abstract;
+using Bookify.Domain.Model;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,19 +9,24 @@ using System.Threading.Tasks;
 
 namespace Application.Authors.Commands.CreateAuthor
 {
-    public class CreateAuthorCommandHandler : IRequestHandler<CreateAuthorCommand, int>
+    public class CreateAuthorCommandHandler: IRequestHandler<CreateAuthorCommand,Author>
     {
-        private readonly IAuthorRepository _repository;
-        public CreateAuthorCommandHandler(IAuthorRepository repository)
+        private readonly IUnitOfWork _unitOfWork;
+        public CreateAuthorCommandHandler(IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
-        public Task<int> Handle(CreateAuthorCommand command, CancellationToken cancellationToken)
-        {
-            var author = new Author(command.name,command.description);
-            _repository.CreateAuthor(author);
 
-            return Task.FromResult(author.id);
+        public async Task<Author> Handle(CreateAuthorCommand request, CancellationToken cancellationToken)
+        {
+            var Author = new Author
+            {
+                Name = request.Name,
+                Description = request.Description
+            };
+            await _unitOfWork.AuthorRepository.Add(Author);
+            await _unitOfWork.Save();
+            return Author;
         }
     }
 }

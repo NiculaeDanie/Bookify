@@ -1,18 +1,22 @@
 ﻿
+using Domain;
+
 namespace Bookify.Domain.Model
 {
     public class Author
     {
-        public int id { get; set; }
-        public string name { get; set; }
-        public List<Book> books { get; set; }
-        public string description { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public ICollection<AuthorBook> AuthorBook { get; set; }
+        public string Description { get; set; }
+        public Author()
+        {
 
+        }
         public Author(string name, string description)
         {
-            this.name = name;
-            this.description = description;
-            this.books = new List<Book>();
+            this.Name = name;
+            this.Description = description;
         }
     }
 }

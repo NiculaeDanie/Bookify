@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Bookify.Domain.Model;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace Application.Authors.Queries.GetAuthorById
 {
-    public class GetAuthorByIdQuery: IRequest<AuthorVm>
+    public class GetAuthorByIdQuery: IRequest<Author>
     {
-        public int id { get; set; }
+        public int Id { get; set; }
     }
 }

@@ -1,37 +1,35 @@
 ﻿
 
+using Domain;
+
 namespace Bookify.Domain.Model
 {
     public class User
     {
-        public int id { get; set; }
-        public string email { get; set; }
-        public string password { get; set; }
-        public string name { get; set; }
-        public List<Book> history { get; set; }
-        public User(int id, string email, string password, string name, List<Book> history)
+        public int Id { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string Name { get; set; }
+        public ICollection<UserBook> UserBook { get; set; }
+        
+        public User()
         {
-            this.id = id;
-            this.email = email;
-            this.password = password;
-            this.name = name;
-            this.history = history;
+
         }
         public User(string email, string password, string name)
         {
-            this.email = email;
-            this.password = password;
-            this.name = name;
-            this.history = new List<Book>();
+            this.Email = email;
+            this.Password = password;
+            this.Name = name;
         }
-        public List<string> GetUserPreferences()
+        public List<Genre> GetUserPreferences()
         {
-            List<string> genre = new List<string>();
-            foreach (var o in history)
+            List<Genre> genre = new List<Genre>();
+            foreach (var o in UserBook)
             {
-                foreach (var i in o.genre)
+                foreach (var i in o.Book.BookGenre)
                 {
-                    genre.Add(i);
+                    genre.Add(i.Genre);
                 }
             }
             var resunt = from c in genre

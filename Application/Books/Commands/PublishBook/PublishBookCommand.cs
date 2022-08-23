@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Bookify.Domain.Model;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace Application.Books.Commands.PublishBook
 {
-    public class PublishBookCommand: IRequest<int>
+    public class PublishBookCommand: IRequest
     {
-        public int bookId { get; set; }
+        public Book Book { get; set; }
     }
 }

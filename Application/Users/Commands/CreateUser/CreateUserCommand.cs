@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Bookify.Domain.Model;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Application.Users.Commands.CreateUser
 {
-    public class CreateUserCommand: IRequest<int>
+    public class CreateUserCommand: IRequest<User>
     {
-        public string email { get; set; }
-        public string password { get; set; }
-        public string name { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string Name { get; set; }
     }
 }

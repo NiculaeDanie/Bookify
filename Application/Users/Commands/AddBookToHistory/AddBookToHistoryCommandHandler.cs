@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿
+using Domain;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,19 +10,11 @@ using System.Threading.Tasks;
 
 namespace Application.Users.Commands.AddBookToHistory
 {
-    public class AddBookToHistoryCommandHandler: IRequestHandler<AddBookToHistoryCommand,int>
+    public class AddBookToHistoryCommandHandler : IRequestHandler<AddBookToHistoryCommand>
     {
-        private readonly IUserRepository _userRepository;
-        public AddBookToHistoryCommandHandler(IUserRepository userRepository)
+        public Task<Unit> Handle(AddBookToHistoryCommand request, CancellationToken cancellationToken)
         {
-            _userRepository = userRepository;
-        }
-
-        public Task<int> Handle(AddBookToHistoryCommand request, CancellationToken cancellationToken)
-        {
-            _userRepository.AddBookToHistory(request.Id, request.book);
-
-            return Task.FromResult(request.Id);
+            throw new NotImplementedException();
         }
     }
 }

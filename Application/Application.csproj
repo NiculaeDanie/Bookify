@@ -12,6 +12,15 @@
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="10.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Genres\Queries\GetGenreById\" />
+    <Folder Include="Genres\Queries\GetGenreList\" />
+    <Folder Include="Users\Queries\GetUserPreferences\" />
+    <Folder Include="Users\Queries\VerifyUser\" />
   </ItemGroup>
 
 </Project>

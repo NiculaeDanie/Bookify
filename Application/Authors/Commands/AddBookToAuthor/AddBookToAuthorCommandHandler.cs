@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿using Application.Abstract;
+using Domain;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,20 +10,19 @@ using System.Threading.Tasks;
 
 namespace Application.Authors.Commands.AddBookToAuthor
 {
-    public class AddBookToAuthorCommandHandler: IRequestHandler<AddBookToAuthorCommand,int>
+    public class AddBookToAuthorCommandHandler: IRequestHandler<AddBookToAuthorCommand>
     {
-        private readonly IAuthorRepository _repository;
-        private readonly IBookRepository _bookRepository;
-        public AddBookToAuthorCommandHandler(IAuthorRepository repository, IBookRepository bookRepository)
+        private readonly IUnitOfWork _unitOfWork;
+        public AddBookToAuthorCommandHandler(IUnitOfWork unitOfWork)
         {
-            _repository = repository;
-            _bookRepository = bookRepository;
+            _unitOfWork = unitOfWork;
         }
-        public Task<int> Handle(AddBookToAuthorCommand command, CancellationToken cancellationToken)
-        {
-            _repository.AddBookToAuthor(command.Id,_bookRepository.GetBook(command.bookId));
 
-            return Task.FromResult(command.bookId);
+        public async Task<Unit> Handle(AddBookToAuthorCommand request, CancellationToken cancellationToken)
+        {
+            await _unitOfWork.AuthorRepository.AddBookToAuthor(request.Author, request.Book);
+            await _unitOfWork.Save();
+            return new Unit();
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using Application.Books.Queries;
-using Bookify.Domain.Model;
+﻿using Bookify.Domain.Model;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,26 +9,11 @@ using System.Threading.Tasks;
 
 namespace Application.Users.Queries.GetUserHistory
 {
-    public class GetUserHistoryQueryHandler: IRequestHandler<GetUserHistoryQuery,IEnumerable<BookVm>>
+    public class GetUserHistoryQueryHandler : IRequestHandler<GetUserHistoryQuery, List<Book>>
     {
-        private readonly IUserRepository _userRepository;
-        public GetUserHistoryQueryHandler(IUserRepository userRepository)
+        public Task<List<Book>> Handle(GetUserHistoryQuery request, CancellationToken cancellationToken)
         {
-            _userRepository = userRepository;
-        }
-
-        public Task<IEnumerable<BookVm>> Handle(GetUserHistoryQuery request, CancellationToken cancellationToken)
-        {
-            var result = _userRepository.GetHistory(request.userId).Select(book => new BookVm
-            {
-                id = book.id,
-                title = book.title,
-                releaseDate = book.releaseDate,
-                description = book.descriprion,
-                status = book.status,
-                genre = book.genre
-            });
-            return Task.FromResult(result);
+            throw new NotImplementedException();
         }
     }
 }

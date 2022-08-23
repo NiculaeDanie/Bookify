@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿using Application.Abstract;
+using Bookify.Domain.Model;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,26 +10,17 @@ using System.Threading.Tasks;
 
 namespace Application.Books.Queries.GetBookById
 {
-    public class GetBookByIdQueryHandler: IRequestHandler<GetBookByIdQuery,BookVm>
+    public class GetBookByIdQueryHandler: IRequestHandler<GetBookByIdQuery,Book>
     {
-        private readonly IBookRepository _bookRepository;
-        public GetBookByIdQueryHandler(IBookRepository bookRepository)
+        private readonly IUnitOfWork _unitOfWork;
+        public GetBookByIdQueryHandler(IUnitOfWork unitOfWork)
         {
-            _bookRepository = bookRepository;
+            _unitOfWork = unitOfWork;
         }
 
-        public Task<BookVm> Handle(GetBookByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Book> Handle(GetBookByIdQuery request, CancellationToken cancellationToken)
         {
-            var book = _bookRepository.GetBook(request.id);
-            var result = new BookVm
-            {
-                    title = book.title,
-                    releaseDate = book.releaseDate,
-                    description = book.descriprion,
-                    status = book.status,
-                    genre = book.genre
-            };
-            return Task.FromResult(result);
+            return await _unitOfWork.BookRepository.GetById(request.BookId);
         }
     }
 }

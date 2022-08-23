@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Application.Authors.Commands.AddBookToAuthor
 {
-    public class AddBookToAuthorCommand: IRequest<int>
+    public class AddBookToAuthorCommand: IRequest
     {
-        public int Id { get; set; }
-        public int bookId { get; set; }
+        public Author Author { get; set; }
+        public Book Book { get; set; }
     }
 }

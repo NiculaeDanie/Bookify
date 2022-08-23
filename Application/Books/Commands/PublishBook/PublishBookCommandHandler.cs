@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using Application.Abstract;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,20 +9,18 @@ using System.Threading.Tasks;
 
 namespace Application.Books.Commands.PublishBook
 {
-    public class PublishBookCommandHandler: IRequestHandler<PublishBookCommand,int>
+    public class PublishBookCommandHandler: IRequestHandler<PublishBookCommand>
     {
-        private readonly IBookRepository _bookRepository;
-        public PublishBookCommandHandler(IBookRepository bookRepository)
+        private readonly IUnitOfWork _unitOfWork;
+        public PublishBookCommandHandler(IUnitOfWork unitOfWork)
         {
-            _bookRepository = bookRepository;
+            _unitOfWork = unitOfWork;
         }
 
-        public Task<int> Handle(PublishBookCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(PublishBookCommand request, CancellationToken cancellationToken)
         {
-            var book = _bookRepository.GetBook(request.bookId);
-            book.PublishBook();
-
-            return Task.FromResult(book.id);
+            await _unitOfWork.BookRepository.PublishBook(request.Book);
+            return new Unit();
         }
     }
 }
