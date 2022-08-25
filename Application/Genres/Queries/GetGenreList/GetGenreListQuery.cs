@@ -1,4 +1,5 @@
 ﻿using Bookify.Domain.Model;
+using Domain;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -6,10 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Books.Commands.PublishBook
+namespace Application.Genres.Queries.GetGenreList
 {
-    public class PublishBookCommand: IRequest
+    public class GetGenreListQuery: IRequest<List<Genre>>
     {
-        public Book Book { get; set; }
     }
 }

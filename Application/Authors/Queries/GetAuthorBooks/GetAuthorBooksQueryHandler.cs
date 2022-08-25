@@ -19,7 +19,8 @@ namespace Application.Authors.Queries.GetAuthorBooks
 
         public async Task<List<Book>> Handle(GetAuthorBooksQuery request, CancellationToken cancellationToken)
         {
-            return await _unitOfWork.AuthorRepository.GetBooks(request.Author);
+            var author = await _unitOfWork.AuthorRepository.GetById(request.AuthorId);
+            return await _unitOfWork.AuthorRepository.GetBooks(author);
         }
     }
 }

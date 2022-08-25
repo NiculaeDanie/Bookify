@@ -32,17 +32,7 @@ internal class Program
         var mediator = Init();
         while (true)
         {
-            Console.WriteLine("Choose an option");
-            Console.WriteLine("1 Add book");
-            Console.WriteLine("2 Get book by id");
-            Console.WriteLine("3 Add author");
-            Console.WriteLine("4 Get author by id");
-            Console.WriteLine("5 Add author to book");
-            Console.WriteLine("6 Display Books by author");
-
-            var action = Convert.ToInt32(Console.ReadLine());
-
-            switch (action)
+            switch (1)
             {
                 case 1:
                     var addedBook = await AddBook(mediator);
@@ -71,7 +61,7 @@ internal class Program
                     }
                     break;
                 default:
-                    Console.WriteLine($"Invalid action: {action}");
+                    
                     break;
             }
         }

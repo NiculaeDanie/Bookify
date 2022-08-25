@@ -49,9 +49,13 @@ namespace Infrastructure.Repository
             return await _context.Books.SingleOrDefaultAsync(b => b.Id == id);
         }
 
-        public async Task PublishBook(Book book)
+        public async Task Remove(Book book)
         {
-            book.PublishBook();
+            _context.Books.Remove(book);
+        }
+
+        public async Task Update(Book book)
+        {
             _context.Update(book);
         }
     }

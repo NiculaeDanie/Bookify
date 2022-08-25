@@ -9,6 +9,6 @@ namespace Application.Authors.Queries.GetAuthorBooks
 {
     public class GetAuthorBooksQuery: IRequest<List<Bookify.Domain.Model.Book>>
     {
-        public Bookify.Domain.Model.Author Author { get; set; }
+        public int AuthorId { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace Bookify.Domain.Model
 
         public int Id { get; set; }
         public string Title { get; set; }
+        public string ImageUrl { get; set; }
         private ICollection<AuthorBook> AuthorBook { get; set; }
         public DateTime ReleaseDate { get; set; }
         public string Description { get; set; }
@@ -34,7 +35,7 @@ namespace Bookify.Domain.Model
             this.Title = title;
             this.ReleaseDate = releaseDate;
             this.Description = descriprion;
-            this.Status = (Status)1;
+            this.Status = (Status)0;
             this.Content = content;
         }
 

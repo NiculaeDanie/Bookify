@@ -20,8 +20,8 @@ namespace Application.Books.Queries.GetBookByGenre
 
         public async Task<List<Book>> Handle(GetBookByGenreQuery request, CancellationToken cancellationToken)
         {
-            
-            return await _unitOfWork.BookRepository.GetBookByGenre(request.Genre);
+            var Genre = await _unitOfWork.GenreRepository.GetById(request.GenreId);
+            return await _unitOfWork.BookRepository.GetBookByGenre(Genre);
         }
     }
 }

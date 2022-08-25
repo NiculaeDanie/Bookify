@@ -21,5 +21,15 @@ namespace Infrastructure
         public DbSet<Author> Authors { get; set; }
         public DbSet<Genre> Genres { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder builder) => builder.UseSqlServer(@"Data Source=DESKTOP-MHJDP0S\SQLEXPRESS;Initial Catalog=Bookify;Trusted_Connection=True;");
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<BookGenre>()
+                .HasOne(x=>x.Book)
+                .WithMany(x=>x.BookGenre)
+                .HasForeignKey("BookId")
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+        }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Bookify.Domain.Model;
-using Domain;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -8,14 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Books.Commands.CreateBook
+namespace Application.Books.Commands.UpdateBook
 {
-    public class CreateBookCommand: IRequest<Book>
+    public class UpdateBookCommand: IRequest<Book>
     {
+        public int BookId { get; set; }
         public string Title { get; set; }
+        public DateTime Created { get; set; }
         public string Description { get; set; }
-        public DateTime ReleaseDate { get; set; }
         public IFormFile Content { get; set; }
-        public string ImageUrl { get; set; }
     }
 }

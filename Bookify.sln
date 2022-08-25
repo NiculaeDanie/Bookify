@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProject1", "TestProject
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{C43F43E0-BD77-4479-A912-C9E41CE56F7E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bookify", "Bookify\Bookify.csproj", "{BADB0BB5-7E21-431C-A451-27E12A4C140B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{C43F43E0-BD77-4479-A912-C9E41CE56F7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C43F43E0-BD77-4479-A912-C9E41CE56F7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C43F43E0-BD77-4479-A912-C9E41CE56F7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BADB0BB5-7E21-431C-A451-27E12A4C140B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BADB0BB5-7E21-431C-A451-27E12A4C140B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BADB0BB5-7E21-431C-A451-27E12A4C140B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BADB0BB5-7E21-431C-A451-27E12A4C140B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

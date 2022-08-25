@@ -1,5 +1,4 @@
-﻿using Bookify.Domain.Model;
-using Domain;
+﻿using Domain;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -7,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Books.Queries.GetBookByGenre
+namespace Application.Genres.Commands.DeleteGenre
 {
-    public class GetBookByGenreQuery: IRequest<List<Book>>
+    public class DeleteGenreCommand: IRequest<Genre>
     {
         public int GenreId { get; set; }
     }

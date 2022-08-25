@@ -12,5 +12,6 @@ namespace Application.Abstract
         Task<Genre> GetById(int genreId);
         Task<List<Genre>> GetAll();
         Task Add(Genre genre);
+        Task Remove(Genre genre);
     }
 }

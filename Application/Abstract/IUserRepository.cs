@@ -13,5 +13,6 @@ namespace Application.Abstract
         Task<List<User>> GetAll();
         Task<List<Genre>> GetUserPreferences(User user);
         Task AddBookToHistory();
+        
     }
 }

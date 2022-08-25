@@ -29,7 +29,8 @@ namespace Application.Books.Commands.CreateBook
                 ReleaseDate = request.ReleaseDate,
                 Status= 0,
                 ViewCount=0,
-                Content= content
+                Content= content,
+                ImageUrl = request.ImageUrl
             };
             await _unitOfWork.BookRepository.Add(Book);
             await _unitOfWork.Save();

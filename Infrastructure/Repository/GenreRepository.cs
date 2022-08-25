@@ -1,5 +1,6 @@
 ﻿using Application;
 using Application.Abstract;
+using Bookify.Domain.Model;
 using Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -30,6 +31,11 @@ namespace Infrastructure.Repository
         public async Task<Genre> GetById(int genreId)
         {
             return await _context.Genres.SingleOrDefaultAsync(g => g.Id == genreId);
+        }
+
+        public async Task Remove(Genre genre)
+        {
+            _context.Genres.Remove(genre);
         }
     }
 }
