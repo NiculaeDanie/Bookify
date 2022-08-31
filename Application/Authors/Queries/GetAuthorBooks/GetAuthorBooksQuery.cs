@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Bookify.Domain.Model;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -20,6 +20,10 @@ namespace Application.Authors.Queries.GetAuthorBooks
         public async Task<List<Book>> Handle(GetAuthorBooksQuery request, CancellationToken cancellationToken)
         {
             var author = await _unitOfWork.AuthorRepository.GetById(request.AuthorId);
+            if (author == null)
+            {
+                return null;
+            }
             return await _unitOfWork.AuthorRepository.GetBooks(author);
         }
     }

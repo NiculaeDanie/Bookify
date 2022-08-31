@@ -24,6 +24,7 @@ namespace Application.Genres.Commands.CreateGenre
                 Name= request.Genre
             };
             await _unitOfWork.GenreRepository.Add(genre);
+            await _unitOfWork.Save();
             return genre;
         }
     }

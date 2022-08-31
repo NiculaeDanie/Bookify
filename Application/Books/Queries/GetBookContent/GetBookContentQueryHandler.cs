@@ -1,20 +1,33 @@
 ﻿
+using Application.Abstract;
 using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+
+using iText.Kernel.Geom;
+using iText.Kernel.Pdf;
+using iText.Layout;
 
 namespace Application.Users.Queries.GetBookContent
 {
-    public class GetBookContentQueryHandler : IRequestHandler<GetBookContentQuery, IFormFile>
+    public class GetBookContentQueryHandler : IRequestHandler<GetBookContentQuery, byte[]>
     {
-        public Task<IFormFile> Handle(GetBookContentQuery request, CancellationToken cancellationToken)
+        private readonly IUnitOfWork unitOfWork;
+        public GetBookContentQueryHandler(IUnitOfWork unitOfWork)
         {
-            throw new NotImplementedException();
+            this.unitOfWork = unitOfWork;
+        }
+        public async Task<byte[]> Handle(GetBookContentQuery request, CancellationToken cancellationToken)
+        {
+            var book = await unitOfWork.BookRepository.GetById(request.BookId);
+            var user = await unitOfWork.UserRepository.GetById(request.UserId);
+            if(book == null || user == null)
+            {
+                return null;
+            }
+            await unitOfWork.UserRepository.AddBookToHistory(book,user);
+            await unitOfWork.BookRepository.IncrementViewCount(book);
+            await unitOfWork.Save();
+            return book.Content;
         }
     }
 }

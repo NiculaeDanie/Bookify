@@ -15,8 +15,12 @@ namespace Application.Abstract
         Task<Book> GetById(int id);
         Task Add(Book book);
         Task<List<Book>> GetBookByGenre(Genre genre);
-        Task<IFormFile> GetBookContent(Book book);
-        Task Remove(Book product);
+        Task<byte[]> GetBookContent(int book);
+        Task Remove(Book book);
         Task Update(Book book);
+        Task IncrementViewCount(Book book);
+        Task<Book> AddGenreToBook(Genre genre, Book book);
+        Task<List<Book>> GetBookByGenre(Genre genre, List<Book> history);
+        Task<List<Book>> Search(string search);
     }
 }

@@ -11,7 +11,8 @@ namespace Bookify.Domain.Model
         public string Password { get; set; }
         public string Name { get; set; }
         public ICollection<UserBook> UserBook { get; set; }
-        
+        public ICollection<UserFavorites> UserFavorites { get; set; }
+
         public User()
         {
 

@@ -14,5 +14,7 @@ namespace Application.Abstract
         Task Add(Author author);
         Task AddBookToAuthor(Author author, Book book);
         Task<List<Book>> GetBooks(Author author);
+        Task Remove(Author author);
+        Task Update(Author Author);
     }
 }

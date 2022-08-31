@@ -1,4 +1,5 @@
 ﻿using Application.Abstract;
+using Bookify.Domain.Model;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Application.Authors.Commands.AddBookToAuthor
 {
-    public class AddBookToAuthorCommandHandler: IRequestHandler<AddBookToAuthorCommand>
+    public class AddBookToAuthorCommandHandler: IRequestHandler<AddBookToAuthorCommand,Book>
     {
         private readonly IUnitOfWork _unitOfWork;
         public AddBookToAuthorCommandHandler(IUnitOfWork unitOfWork)
@@ -18,11 +19,17 @@ namespace Application.Authors.Commands.AddBookToAuthor
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Unit> Handle(AddBookToAuthorCommand request, CancellationToken cancellationToken)
+        public async Task<Book> Handle(AddBookToAuthorCommand request, CancellationToken cancellationToken)
         {
-            await _unitOfWork.AuthorRepository.AddBookToAuthor(request.Author, request.Book);
+            var author = await _unitOfWork.AuthorRepository.GetById(request.AuthorId);
+            var book = await _unitOfWork.BookRepository.GetById(request.BookId);
+            if(author == null || book == null)
+            {
+                return null;
+            }
+            await _unitOfWork.AuthorRepository.AddBookToAuthor(author, book);
             await _unitOfWork.Save();
-            return new Unit();
+            return book;
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Infrastructure.Repository
 
         public async Task<List<Book>> GetBooks(Author author)
         {
-            var auth = await _context.Authors.Include(a=> a.AuthorBook).ThenInclude(b=> b.Book).SingleOrDefaultAsync(a => a.Id == author.Id);
+            var auth = await _context.Authors.Include(a => a.AuthorBook).ThenInclude(b => b.Book).SingleOrDefaultAsync(a => a.Id == author.Id);
             return auth.AuthorBook.Select(a => a.Book).ToList();
         }
 
@@ -53,6 +53,16 @@ namespace Infrastructure.Repository
         {
             var author = await _context.Authors.SingleOrDefaultAsync(a => a.Id == AuthorId);
             return author;
+        }
+
+        public async Task Remove(Author author)
+        {
+            _context.Authors.Remove(author);
+        }
+
+        public async Task Update(Author author)
+        {
+            _context.Authors.Update(author);
         }
     }
 }

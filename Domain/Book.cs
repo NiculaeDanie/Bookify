@@ -13,12 +13,13 @@ namespace Bookify.Domain.Model
         public int Id { get; set; }
         public string Title { get; set; }
         public string ImageUrl { get; set; }
-        private ICollection<AuthorBook> AuthorBook { get; set; }
+        public ICollection<AuthorBook> AuthorBook { get; set; }
         public DateTime ReleaseDate { get; set; }
         public string Description { get; set; }
         public Status Status { get; set; }
-        public ICollection<BookGenre> BookGenre { get; set; } 
+        public ICollection<BookGenre> BookGenre { get; set; }
         public ICollection<UserBook> UserBook { get; set; }
+        public ICollection<UserFavorites> UserFavorites { get; set; }
         public int ViewCount { get; set; }
         public byte[] Content { get; set; }
 
@@ -55,6 +56,11 @@ namespace Bookify.Domain.Model
             var stream = new MemoryStream(this.Content);
             IFormFile file = new FormFile(stream, 0, stream.Length, Title, Title);
             return file;
+        }
+
+        public void Increment()
+        {
+            ViewCount += 1;
         }
     }
 

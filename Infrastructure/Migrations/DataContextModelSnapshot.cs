@@ -140,9 +140,6 @@ namespace Infrastructure.Migrations
                     b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<int>("GenreId")
                         .HasColumnType("int");
 
@@ -195,6 +192,29 @@ namespace Infrastructure.Migrations
                     b.ToTable("UserBook");
                 });
 
+            modelBuilder.Entity("Domain.UserFavorites", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserFavorites");
+                });
+
             modelBuilder.Entity("Domain.AuthorBook", b =>
                 {
                     b.HasOne("Bookify.Domain.Model.Author", "Author")
@@ -204,7 +224,7 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Bookify.Domain.Model.Book", "Book")
-                        .WithMany()
+                        .WithMany("AuthorBook")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -252,6 +272,25 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.UserFavorites", b =>
+                {
+                    b.HasOne("Bookify.Domain.Model.Book", "Book")
+                        .WithMany("UserFavorites")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bookify.Domain.Model.User", "User")
+                        .WithMany("UserFavorites")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Bookify.Domain.Model.Author", b =>
                 {
                     b.Navigation("AuthorBook");
@@ -259,14 +298,20 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Bookify.Domain.Model.Book", b =>
                 {
+                    b.Navigation("AuthorBook");
+
                     b.Navigation("BookGenre");
 
                     b.Navigation("UserBook");
+
+                    b.Navigation("UserFavorites");
                 });
 
             modelBuilder.Entity("Bookify.Domain.Model.User", b =>
                 {
                     b.Navigation("UserBook");
+
+                    b.Navigation("UserFavorites");
                 });
 
             modelBuilder.Entity("Domain.Genre", b =>

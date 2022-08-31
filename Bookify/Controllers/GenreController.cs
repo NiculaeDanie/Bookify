@@ -1,7 +1,4 @@
-﻿using Application.Books.Commands.CreateBook;
-using Application.Books.Commands.Delete_Book;
-using Application.Books.Queries.GetBookById;
-using Application.Books.Queries.GetBookList;
+﻿
 using Application.Genres.Commands.CreateGenre;
 using Application.Genres.Commands.DeleteGenre;
 using Application.Genres.Queries.GetGenreById;
