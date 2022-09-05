@@ -19,9 +19,9 @@ namespace ConsolePresentation
 {
     public class Seeder
     {
-        public static async void SeedData()
+        public static async void SeedData(DataContext context)
         {
-            using var context = new DataContext();
+            
 
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();

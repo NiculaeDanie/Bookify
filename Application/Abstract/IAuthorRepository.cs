@@ -16,5 +16,6 @@ namespace Application.Abstract
         Task<List<Book>> GetBooks(Author author);
         Task Remove(Author author);
         Task Update(Author Author);
+        Task<List<Author>> Search(string search);
     }
 }

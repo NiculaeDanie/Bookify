@@ -1,4 +1,6 @@
 ﻿using Bookify.Services;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Extensions.Options;
 
 namespace Bookify.Middleware
 {
@@ -8,6 +10,7 @@ namespace Bookify.Middleware
         private readonly ITransientService _transient;
         private readonly ISingletonService _singleton;
         private readonly ILogger<Middleware> _logger;
+
         //private readonly IScopedService _scoped;
 
         public Middleware(RequestDelegate next, ITransientService transient, ISingletonService singleton,
@@ -21,11 +24,9 @@ namespace Bookify.Middleware
             _logger.LogInformation($"Middleware Transient GUID: {_transient.Guid}");
         }
 
-        public Task Invoke(HttpContext httpContext)
+        public async Task Invoke(HttpContext httpContext)
         {
-            //logfic on the request
-            return _next(httpContext);
-            //logic on the response
+            await _next.Invoke(httpContext);
 
         }
     }

@@ -24,7 +24,7 @@ namespace Application.Authors.Queries.GetAuthorBooks
             {
                 return null;
             }
-            return await _unitOfWork.AuthorRepository.GetBooks(author);
+            return await _unitOfWork.BookRepository.GetBookByAuthor(author);
         }
     }
 }

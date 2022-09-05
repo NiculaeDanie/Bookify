@@ -30,7 +30,7 @@ internal class Program
         var context = new DataContext();
         context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
-        Seeder.SeedData();
+        Seeder.SeedData(context);
     }
     
 }

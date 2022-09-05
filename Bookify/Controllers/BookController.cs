@@ -17,6 +17,7 @@ using Application.Authors.Queries.GetAuthorById;
 using Bookify.Domain.Model;
 using Application.Books.Queries.GetBookByGenreFiltered;
 using Application.Books.Queries.Search;
+using Bookify.Middleware;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -28,15 +29,18 @@ namespace Bookify.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
-        public BookController(IMediator mediator, IMapper mapper)
+        private readonly ILogger<BookController> _logger;
+        public BookController(IMediator mediator, IMapper mapper, ILogger<BookController> logger)
         {
             _mediator = mediator;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
+            _logger.LogInformation(LogEvents.ListItems, "Get all Books");
             var result = await _mediator.Send(new GetBookListQuery());
             var mappedResult = _mapper.Map<List<BookGetDto>>(result);
             return Ok(mappedResult);
@@ -46,10 +50,16 @@ namespace Bookify.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
+            _logger.LogInformation(LogEvents.GetItem, "GET Book id {id}", id);
             var result = await _mediator.Send(new GetBookByIdQuery
             {
                 BookId = id
             });
+            if (result == null)
+            {
+                _logger.LogWarning(LogEvents.GetItemNotFound, "Book id {id} not found", id);
+                return NotFound();
+            }
             var mappedResult = _mapper.Map<BookGetDto>(result);
             return Ok(mappedResult);
         }
@@ -58,8 +68,10 @@ namespace Bookify.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromForm] BookPutPostDto book)
         {
+            _logger.LogInformation(LogEvents.InsertItem, "Post Book {name},{description}", book.Title, book.Description);
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("Post Book bad request");
                 return BadRequest(ModelState);
             }
             var command = new CreateBookCommand
@@ -80,6 +92,7 @@ namespace Bookify.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsync(int id, [FromBody] BookPutPostDto value)
         {
+            _logger.LogInformation(LogEvents.UpdateItem, "Post Book id {id}", id);
             var command = new UpdateBookCommand
             {
                 BookId = id,
@@ -90,7 +103,10 @@ namespace Bookify.Controllers
             var result = await _mediator.Send(command);
 
             if (result == null)
+            {
+                _logger.LogWarning(LogEvents.UpdateItemNotFound, "Book id {id} not found", id);
                 return NotFound();
+            }
 
             return NoContent();
         }
@@ -99,11 +115,15 @@ namespace Bookify.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+            _logger.LogInformation(LogEvents.DeleteItem, "Delete Book id {id}", id);
             var command = new DeleteBookCommand { BookId = id };
             var result = await _mediator.Send(command);
 
             if (result == null)
+            {
+                _logger.LogWarning(LogEvents.DeleteItemNotFound, "Book id {id} not found", id);
                 return NotFound();
+            };
 
             return NoContent();
         }
@@ -111,43 +131,54 @@ namespace Bookify.Controllers
         [HttpGet("Genre/{id}")]
         public async Task<IActionResult> GetByGenre(int id)
         {
-
+            _logger.LogInformation(LogEvents.ListItems, "Get all Books with Genre id {id}",id);
             var result = await _mediator.Send(new GetBookByGenreQuery
             {
                 GenreId = id
             });
-            if(result == null)
+            if (result == null)
+            {
+                _logger.LogWarning(LogEvents.GetItemNotFound, "Genre id {id} not found", id);
                 return NotFound();
+            }
 
-            var mappedResult = _mapper.Map<List<BookGetDto>>(result);
+            var mappedResult = _mapper.Map<List<FullBookDto>>(result);
+            
             return Ok(mappedResult);
         }
 
         [HttpGet("Content/{userid}/{id}")]
         public async Task<IActionResult> GetContent(int id, int userid)
         {
+            _logger.LogInformation(LogEvents.GetItem, "Get book content with id {id}", id);
             var result = await _mediator.Send(new GetBookContentQuery
             {
                 UserId = userid,
                 BookId = id
             });
             if (result == null)
+            {
+                _logger.LogWarning(LogEvents.GetItemNotFound, "Book id {id} not found", id);
                 return NotFound();
+            }
             return File(result, "application/pdf", "yourFileName.pdf");
         }
 
-        [HttpGet("Author/{id}/{userid}")]
-        public async Task<IActionResult> GetByAuthor(int id, int? userid)
+        [HttpGet("Author/{id}")]
+        public async Task<IActionResult> GetByAuthor(int id)
         {
-
+            _logger.LogInformation(LogEvents.ListItems, "Get all Books with Author id {id}", id);
             var result = await _mediator.Send(new GetAuthorBooksQuery
             {
                AuthorId = id
             });
 
-            if(result == null)
+            if (result == null)
+            {
+                _logger.LogWarning(LogEvents.GetItemNotFound, "Author id {id} not found", id);
                 return NotFound();
-            var mappedResult = _mapper.Map<List<BookGetDto>>(result);
+            };
+            var mappedResult = _mapper.Map<List<FullBookDto>>(result);
             return Ok(mappedResult);
         }
 
@@ -193,20 +224,16 @@ namespace Bookify.Controllers
             if (result == null)
                 return NotFound();
 
-            var mappedResult = _mapper.Map<List<BookGetDto>>(result);
-            return Ok(mappedResult);
-        }
-        [HttpGet("{searchstring}")]
-        public async Task<IActionResult> Search(string searchstring)
-        {
-            var result = await _mediator.Send(new SearchQuery
+            var mappedResult = _mapper.Map<List<FullBookDto>>(result);
+            foreach(var item in result)
             {
-                SString = searchstring
-            });
-            if (result == null)
-                return NotFound();
-            var mappedResult = _mapper.Map<List<BookGetDto>>(result);
+                if (item.UserFavorites.Any(x => x.UserId == userid))
+                {
+                    mappedResult.Where(x => x.Id == item.Id).Single().IsFavorited = true;
+                }
+            }
             return Ok(mappedResult);
         }
+        
     }
 }

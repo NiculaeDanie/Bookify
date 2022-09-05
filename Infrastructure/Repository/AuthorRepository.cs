@@ -64,5 +64,10 @@ namespace Infrastructure.Repository
         {
             _context.Authors.Update(author);
         }
+
+        public async Task<List<Author>> Search(string search)
+        {
+            return await _context.Authors.Where(b => b.Name.Contains(search) || b.Description.Contains(search)).ToListAsync();
+        }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Application.Authors.Commands.CreateAuthor;
 using Application.Authors.Commands.DeleteAuthor;
+using Application.Authors.Queries.SearchAuthor;
+using Application.Books.Queries.Search;
 using Application.Users.Commands.AddBookToFavorites;
 using Application.Users.Commands.CreateUser;
 using Application.Users.Queries.GetUserFavorites;
@@ -120,6 +122,31 @@ namespace Bookify.Controllers
                 return NotFound();
 
             return NoContent();
+        }
+
+        [HttpGet("{searchstring}")]
+        public async Task<IActionResult> Search(string searchstring)
+        {
+            var result = await _mediator.Send(new SearchQuery
+            {
+                SString = searchstring
+            });
+            var result2 = await _mediator.Send(new SearchAuthorQuery
+            {
+                Search = searchstring
+            });
+            if (result == null && result2 == null)
+                return NotFound();
+            var mappedResult = new List<AuthorBookGetDto>();
+            foreach(var item in result)
+            {
+                mappedResult.Add(new AuthorBookGetDto { Id = item.Id, Title=item.Title, Type="Book" });
+            }
+            foreach (var item in result2)
+            {
+                mappedResult.Add(new AuthorBookGetDto { Id = item.Id, Title = item.Name, Type = "Author" });
+            }
+            return Ok(mappedResult);
         }
     }
 }

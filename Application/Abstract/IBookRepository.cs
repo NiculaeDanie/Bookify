@@ -22,5 +22,6 @@ namespace Application.Abstract
         Task<Book> AddGenreToBook(Genre genre, Book book);
         Task<List<Book>> GetBookByGenre(Genre genre, List<Book> history);
         Task<List<Book>> Search(string search);
+        Task<List<Book>> GetBookByAuthor(Author author);
     }
 }

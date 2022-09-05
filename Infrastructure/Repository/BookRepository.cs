@@ -46,21 +46,26 @@ namespace Infrastructure.Repository
 
         public async Task<List<Book>> GetAll()
         {
-            return await _context.Books.Take(100).OrderByDescending(x=>x.ViewCount).ToListAsync();
+            return await _context.Books.OrderByDescending(x=>x.ViewCount).ToListAsync();
         }
 
         public async Task<List<Book>> GetBookByGenre(Genre genre)
         {
-            var genres = await _context.Genres.Include(a => a.BookGenre).ThenInclude(b => b.Book).SingleOrDefaultAsync(a => a.Id == genre.Id);
-            return genres.BookGenre.Select(a => a.Book).ToList();
+            var book = await _context.Books.Include(x => x.AuthorBook).ThenInclude(x => x.Author).Include(x => x.BookGenre).ThenInclude(x => x.Genre).Where(a => a.BookGenre.Any(x => x.GenreId == genre.Id)).OrderByDescending(x => x.ViewCount).ToListAsync();
+            return book;
         }
+
 
         public async Task<List<Book>> GetBookByGenre(Genre genre,List<Book> history)
         {
-            var genres = await _context.Genres.Include(a => a.BookGenre).ThenInclude(b => b.Book).SingleOrDefaultAsync(a => a.Id == genre.Id);
-            return genres.BookGenre.Select(a => a.Book).Except(history).ToList();
+            var book = await _context.Books.Include(x => x.AuthorBook).ThenInclude(x => x.Author).Include(x => x.BookGenre).ThenInclude(x => x.Genre).Where(a => a.BookGenre.Any(x=> x.GenreId == genre.Id) ).OrderByDescending(x=>x.ViewCount).Except(history).ToListAsync();
+            return book;
         }
-
+        public async Task<List<Book>> GetBookByAuthor(Author author)
+        {
+            var book = await _context.Books.Include(x => x.AuthorBook).ThenInclude(x => x.Author).Include(x => x.BookGenre).ThenInclude(x => x.Genre).Where(a => a.AuthorBook.Any(x => x.AuthorId == author.Id)).OrderByDescending(x => x.ViewCount).ToListAsync();
+            return book;
+        }
 
         public async Task<byte[]> GetBookContent(int book)
         {
