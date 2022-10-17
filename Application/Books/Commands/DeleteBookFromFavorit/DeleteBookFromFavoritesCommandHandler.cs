@@ -1,6 +1,7 @@
 ﻿using Application.Abstract;
 using Bookify.Domain.Model;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,18 +13,22 @@ namespace Application.Users.Commands.DeleteBookFromFavorit
     public class DeleteBookFromFavoritesCommandHandler: IRequestHandler<DeleteBookFromFavoritesCommand,Book>
     {
         private readonly IUnitOfWork _unitOfWork;
-        public DeleteBookFromFavoritesCommandHandler(IUnitOfWork unitOfWork)
+        private readonly UserManager<User> _userManager;
+        public DeleteBookFromFavoritesCommandHandler(IUnitOfWork unitOfWork, UserManager<User> userManager)
         {
             _unitOfWork = unitOfWork;
+            _userManager = userManager;
         }
 
         public async Task<Book> Handle(DeleteBookFromFavoritesCommand request, CancellationToken cancellationToken)
         {
             var book = await _unitOfWork.BookRepository.GetById(request.BookId);
-            var user = await _unitOfWork.UserRepository.GetById(request.UserId);
-            if (user == null || book == null)
+            var user = await _userManager.FindByEmailAsync(request.UserId);
+            if ( book == null)
                 return null;
-            await _unitOfWork.UserRepository.DeleteFromFavorites(book, user);
+            var item = book.UserFavorites.Single(b=> b.UserId == user.Id);
+            book.UserFavorites.Remove(item);
+            await _unitOfWork.BookRepository.Update(book);
             await _unitOfWork.Save();
             return book;
         }

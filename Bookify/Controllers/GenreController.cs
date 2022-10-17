@@ -8,6 +8,7 @@ using Bookify.Domain.Model;
 using Bookify.Dto;
 using Bookify.Middleware;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -58,7 +59,7 @@ namespace Bookify.Controllers
 
         // POST api/<GenreController>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] GenrePutPostDto value)
+        public async Task<IActionResult> Post([FromForm] GenrePutPostDto value)
         {
             _logger.LogInformation(LogEvents.InsertItem, "Post Book {name}", value.Title);
             if (!ModelState.IsValid)

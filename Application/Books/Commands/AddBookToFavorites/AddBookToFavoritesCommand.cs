@@ -10,7 +10,7 @@ namespace Application.Users.Commands.AddBookToFavorites
 {
     public class AddBookToFavoritesCommand: IRequest<Book>
     {
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public int BookId { get; set; }
     }
 }

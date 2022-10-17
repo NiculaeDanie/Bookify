@@ -20,13 +20,8 @@ namespace Application.Books.Queries.GetBookByGenreFiltered
         public async Task<List<Book>> Handle(GetBookByGenreFilteredQuery request, CancellationToken cancellationToken)
         {
             var genre = await _unitOfWork.GenreRepository.GetById(request.GenreId);
-            var user = await _unitOfWork.UserRepository.GetById(request.UserId);
-            if (genre == null || user == null)
-            {
-                return null;
-            }
-            var history = await _unitOfWork.UserRepository.GetUserHistory(user.Id);
-            return await _unitOfWork.BookRepository.GetBookByGenre(genre, history);
+           
+            return await _unitOfWork.BookRepository.GetBookByGenre(genre);
         }
     }
 }

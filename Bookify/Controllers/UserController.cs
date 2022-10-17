@@ -1,16 +1,16 @@
-﻿using Application.Authors.Commands.CreateAuthor;
-using Application.Authors.Commands.DeleteAuthor;
-using Application.Authors.Queries.SearchAuthor;
-using Application.Books.Queries.Search;
-using Application.Users.Commands.AddBookToFavorites;
-using Application.Users.Commands.CreateUser;
-using Application.Users.Queries.GetUserFavorites;
-using Application.Users.Queries.GetUserHistory;
-using Application.Users.Queries.VerifyUser;
-using AutoMapper;
+﻿using AutoMapper;
+using Bookify.Domain.Model;
 using Bookify.Dto;
+using Bookify.Services;
+using Domain;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -22,131 +22,131 @@ namespace Bookify.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
-        public UserController(IMapper mapper, IMediator mediator)
+        private readonly IConfiguration _configuration;
+        private readonly UserManager<User> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
+        public UserController(IMapper mapper, IMediator mediator, IConfiguration configuration, UserManager<User> userManager,RoleManager<IdentityRole> roleManager)
         {
             _mapper = mapper;
             _mediator = mediator;
+            _configuration = configuration;
+            this.userManager = userManager;
+            this.roleManager = roleManager;
         }
-
-        // GET api/<UserController>/5
-        [HttpGet("{email}/{password}")]
-        public async Task<IActionResult> Get(string email, string password)
+        [HttpGet]
+        [Route("getroles/{email}")]
+        public async Task<IActionResult> GetRoles(string email)
         {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user != null)
+            {
+                var userRoles = await userManager.GetRolesAsync(user);
 
-            var result = await _mediator.Send(new VerifyUserQuery
-            {
-                email = email,
-                password = password
-            });
-            if (result == null)
-            {
-                return NotFound();
+                var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                };
+                foreach (var userRole in userRoles)
+                {
+                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                }
+                return Ok(authClaims);
             }
-            var mappedResult = _mapper.Map<UserGetDto>(result);
-            return Ok(mappedResult);
-
+            return BadRequest();
         }
-        [HttpGet("History/{userid}")]
-        public async Task<IActionResult> GetHistory(int userid)
-        {
 
-            var result = await _mediator.Send(new GetUserHistoryQuery
-            {
-                UserId = userid
-            });
-            if (result == null)
-            {
-                return NotFound();
-            }
-            var mappedResult = _mapper.Map<List<BookGetDto>>(result);
-            return Ok(mappedResult);
-
-        }
-        // POST api/<UserController>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] UserPutPostDto value)
+        [Route("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
-            if (!ModelState.IsValid)
+            var user = await userManager.FindByEmailAsync(model.Email);
+            if (user != null && await userManager.CheckPasswordAsync(user, model.Password))
             {
-                return BadRequest(ModelState);
-            }
-            var command = new CreateUserCommand
-            {
-                Name = value.Name,
-                Email = value.Email,
-                Password = value.Password
-            };
-            var result = await _mediator.Send(command);
-            if(result == null)
-            {
-                return BadRequest();
-            }
-            var mappedResult = _mapper.Map<UserGetDto>(result);
+                var userRoles = await userManager.GetRolesAsync(user);
 
-            return CreatedAtAction(nameof(Post), new { id = mappedResult.Id }, mappedResult);
+                var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                };
+
+                foreach (var userRole in userRoles)
+                {
+                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                }
+
+                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["JWT:ValidIssuer"],
+                    audience: _configuration["JWT:ValidAudience"],
+                    expires: DateTime.Now.AddHours(3),
+                    claims: authClaims,
+                    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                    );
+
+                return Ok(new
+                {
+                    role = userRoles,
+                    token = new JwtSecurityTokenHandler().WriteToken(token),
+                    expiration = token.ValidTo
+                });
+            }
+            return Unauthorized();
         }
-        [HttpPost("{bookid}/{id}")]
-        public async Task<IActionResult> PostBook(int bookid, int id)
+
+        [HttpPost]
+        [Route("register")]
+        public async Task<IActionResult> Register([FromBody] UserPutPostDto model)
         {
-            var result = await _mediator.Send(new AddBookToFavoritesCommand
+            var userExists = await userManager.FindByEmailAsync(model.Email);
+            if (userExists != null)
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            User user = new User()
             {
-                UserId = id,
-                BookId = bookid
-            });
-            if (result == null)
-                return NoContent();
+                Email = model.Email,
+                SecurityStamp = Guid.NewGuid().ToString(),
+                UserName = model.Name
+            };
+            var result = await userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
             return Ok();
         }
-        [HttpGet("Favorites/{userid}")]
-        public async Task<IActionResult> GetFavorites(int userid)
+
+        [HttpPost]
+        [Route("register-admin")]
+        public async Task<IActionResult> RegisterAdmin([FromBody] UserPutPostDto model)
         {
+            var userExists = await userManager.FindByEmailAsync(model.Email);
+            if (userExists != null)
+                return StatusCode(StatusCodes.Status500InternalServerError);
 
-            var result = await _mediator.Send(new GetUserFavoritesQuery
+            User user = new User()
             {
-                UserId = userid
-            });
-            if (result == null)
+                Email = model.Email,
+                SecurityStamp = Guid.NewGuid().ToString(),
+                UserName = model.Name
+            };
+            var result = await userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            if (!await roleManager.RoleExistsAsync(UserRoles.Admin))
+                await roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
+            if (!await roleManager.RoleExistsAsync(UserRoles.User))
+                await roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+
+            if (await roleManager.RoleExistsAsync(UserRoles.Admin))
             {
-                return NotFound();
+                await userManager.AddToRoleAsync(user, UserRoles.Admin);
             }
-            var mappedResult = _mapper.Map<List<BookGetDto>>(result);
-            return Ok(mappedResult);
-        }
-        [HttpDelete("{bookid}/{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var command = new DeleteAuthorCommand { AuthorId = id };
-            var result = await _mediator.Send(command);
 
-            if (result == null)
-                return NotFound();
-
-            return NoContent();
+            return Ok();
         }
 
-        [HttpGet("{searchstring}")]
-        public async Task<IActionResult> Search(string searchstring)
-        {
-            var result = await _mediator.Send(new SearchQuery
-            {
-                SString = searchstring
-            });
-            var result2 = await _mediator.Send(new SearchAuthorQuery
-            {
-                Search = searchstring
-            });
-            if (result == null && result2 == null)
-                return NotFound();
-            var mappedResult = new List<AuthorBookGetDto>();
-            foreach(var item in result)
-            {
-                mappedResult.Add(new AuthorBookGetDto { Id = item.Id, Title=item.Title, Type="Book" });
-            }
-            foreach (var item in result2)
-            {
-                mappedResult.Add(new AuthorBookGetDto { Id = item.Id, Title = item.Name, Type = "Author" });
-            }
-            return Ok(mappedResult);
-        }
     }
 }

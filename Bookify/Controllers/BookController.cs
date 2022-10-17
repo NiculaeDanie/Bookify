@@ -18,6 +18,16 @@ using Bookify.Domain.Model;
 using Application.Books.Queries.GetBookByGenreFiltered;
 using Application.Books.Queries.Search;
 using Bookify.Middleware;
+using Application.Books.Queries.GetBookImage;
+using Application.Users.Queries.GetUserHistory;
+using Application.Authors.Queries.SearchAuthor;
+using Application.Users.Commands.AddBookToFavorites;
+using Application.Users.Commands.DeleteBookFromFavorit;
+using Application.Users.Queries.GetUserFavorites;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Globalization;
+using Microsoft.AspNetCore.Http;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -30,11 +40,13 @@ namespace Bookify.Controllers
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
         private readonly ILogger<BookController> _logger;
-        public BookController(IMediator mediator, IMapper mapper, ILogger<BookController> logger)
+        private readonly UserManager<User> _userManager;
+        public BookController(IMediator mediator, IMapper mapper, ILogger<BookController> logger, UserManager<User> userManager)
         {
             _mediator = mediator;
             _mapper = mapper;
             _logger = logger;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -47,6 +59,32 @@ namespace Bookify.Controllers
         }
 
         // GET api/<BookController>/5
+        [HttpGet("{id}/{email}")]
+        public async Task<IActionResult> Get(int id,string email)
+        {
+            _logger.LogInformation(LogEvents.GetItem, "GET Book id {id}", id);
+            var result = await _mediator.Send(new GetBookByIdQuery
+            {
+                BookId = id
+            });
+            if (result == null)
+            {
+                _logger.LogWarning(LogEvents.GetItemNotFound, "Book id {id} not found", id);
+                return NotFound();
+            }
+            var mappedResult = _mapper.Map<FullBookDto>(result);
+            var user = await _userManager.FindByEmailAsync(email);
+            if(result.UserFavorites != null)
+            {
+                if(result.UserFavorites.Any(x => x.UserId == user.Id))
+                {
+                    mappedResult.IsFavorited = true;
+                }
+            }
+
+            return Ok(mappedResult);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -60,10 +98,10 @@ namespace Bookify.Controllers
                 _logger.LogWarning(LogEvents.GetItemNotFound, "Book id {id} not found", id);
                 return NotFound();
             }
-            var mappedResult = _mapper.Map<BookGetDto>(result);
+            var mappedResult = _mapper.Map<FullBookDto>(result);
+
             return Ok(mappedResult);
         }
-
         // POST api/<BookController>
         [HttpPost]
         public async Task<IActionResult> Post([FromForm] BookPutPostDto book)
@@ -80,7 +118,7 @@ namespace Bookify.Controllers
                 Description = book.Description,
                 ReleaseDate = book.RealeaseDate,
                 Content = book.Content,
-                ImageUrl = book.ImageUrl
+                Image = book.Image
             };
             var result = await _mediator.Send(command);
             var mappedResult = _mapper.Map<BookGetDto>(result);
@@ -90,7 +128,7 @@ namespace Bookify.Controllers
 
         // PUT api/<BookController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAsync(int id, [FromBody] BookPutPostDto value)
+        public async Task<IActionResult> PutAsync(int id, [FromForm] BookPostDto value)
         {
             _logger.LogInformation(LogEvents.UpdateItem, "Post Book id {id}", id);
             var command = new UpdateBookCommand
@@ -98,6 +136,7 @@ namespace Bookify.Controllers
                 BookId = id,
                 Title = value.Title,
                 Content = value.Content,
+                Description = value.Description,
                 Created = value.RealeaseDate
             };
             var result = await _mediator.Send(command);
@@ -147,13 +186,13 @@ namespace Bookify.Controllers
             return Ok(mappedResult);
         }
 
-        [HttpGet("Content/{userid}/{id}")]
-        public async Task<IActionResult> GetContent(int id, int userid)
+        [HttpGet("Content/{email}/{id}")]
+        public async Task<IActionResult> GetContent(int id, string email)
         {
             _logger.LogInformation(LogEvents.GetItem, "Get book content with id {id}", id);
             var result = await _mediator.Send(new GetBookContentQuery
             {
-                UserId = userid,
+                UserId = email,
                 BookId = id
             });
             if (result == null)
@@ -161,9 +200,23 @@ namespace Bookify.Controllers
                 _logger.LogWarning(LogEvents.GetItemNotFound, "Book id {id} not found", id);
                 return NotFound();
             }
-            return File(result, "application/pdf", "yourFileName.pdf");
+            return File(result.Content, "application/pdf", result.Name); ;
         }
-
+        [HttpGet("Image/{id}")]
+        public async Task<IActionResult> GetImage(int id)
+        {
+            _logger.LogInformation(LogEvents.GetItem, "Get book image with id {id}", id);
+            var result = await _mediator.Send(new GetBookImageQuery
+            {
+                BookId = id
+            });
+            if (result == null)
+            {
+                _logger.LogWarning(LogEvents.GetItemNotFound, "Book id {id} not found", id);
+                return NotFound();
+            }
+            return File(result.Content, result.ContentType, result.Name); ;
+        }
         [HttpGet("Author/{id}")]
         public async Task<IActionResult> GetByAuthor(int id)
         {
@@ -212,14 +265,14 @@ namespace Bookify.Controllers
 
             return NoContent();
         }
-        [HttpGet("Genre/{id}/{userid}")]
-        public async Task<IActionResult> GetByGenreFiltered(int id, int userid)
+        [HttpGet("Genre/{id}/{email}")]
+        public async Task<IActionResult> GetByGenreFiltered(int id, string email)
         {
 
             var result = await _mediator.Send(new GetBookByGenreFilteredQuery
             {
                 GenreId = id,
-                UserId = userid
+                UserId = email
             });
             if (result == null)
                 return NotFound();
@@ -227,13 +280,93 @@ namespace Bookify.Controllers
             var mappedResult = _mapper.Map<List<FullBookDto>>(result);
             foreach(var item in result)
             {
-                if (item.UserFavorites.Any(x => x.UserId == userid))
+                if (item.UserFavorites.Any(x => x.User.Email == email))
                 {
                     mappedResult.Where(x => x.Id == item.Id).Single().IsFavorited = true;
                 }
             }
             return Ok(mappedResult);
         }
-        
+        [HttpGet("History/{email}")]
+        public async Task<IActionResult> GetHistory(string email)
+        {
+
+            var result = await _mediator.Send(new GetUserHistoryQuery
+            {
+                UserId = email
+            });
+            if (result == null)
+            {
+                return NotFound();
+            }
+            var mappedResult = _mapper.Map<List<FullBookDto>>(result);
+            return Ok(mappedResult);
+
+        }
+        [HttpPost("{bookid}/{email}")]
+        public async Task<IActionResult> PostBook(int bookid, string email)
+        {
+            var result = await _mediator.Send(new AddBookToFavoritesCommand
+            {
+                UserId = email,
+                BookId = bookid
+            });
+            if (result == null)
+                return NoContent();
+            var mappedResult = _mapper.Map<FullBookDto>(result);
+            return Ok(mappedResult);
+        }
+        [HttpGet("Favorites/{email}")]
+        public async Task<IActionResult> GetFavorites(string email)
+        {
+
+            var result = await _mediator.Send(new GetUserFavoritesQuery
+            {
+                UserId = email
+            });
+            if (result == null)
+            {
+                return NotFound();
+            }
+            var mappedResult = _mapper.Map<List<FullBookDto>>(result);
+            return Ok(mappedResult);
+        }
+        [HttpDelete("{bookid}/{email}")]
+        public async Task<IActionResult> Delete(string email, int bookid)
+        {
+            var command = new DeleteBookFromFavoritesCommand { UserId = email, BookId = bookid };
+            var result = await _mediator.Send(command);
+
+            if (result == null)
+                return NotFound();
+            var mappedResult = _mapper.Map<BookGetDto>(result);
+            return Ok(mappedResult);
+        }
+
+        [HttpGet("Search/{searchstring}")]
+        public async Task<IActionResult> Search(string searchstring)
+        {
+            var result = await _mediator.Send(new SearchQuery
+            {
+                SString = searchstring
+            });
+            var result2 = await _mediator.Send(new SearchAuthorQuery
+            {
+                Search = searchstring
+            });
+            if (result == null && result2 == null)
+                return NotFound();
+            var mappedResult = new List<AuthorBookGetDto>();
+            foreach (var item in result)
+            {
+                mappedResult.Add(new AuthorBookGetDto { Id = item.Id, Title = item.Title, Type = "Book" });
+            }
+            foreach (var item in result2)
+            {
+                mappedResult.Add(new AuthorBookGetDto { Id = item.Id, Title = item.Name, Type = "Author" });
+            }
+            return Ok(mappedResult);
+        }
+
     }
 }

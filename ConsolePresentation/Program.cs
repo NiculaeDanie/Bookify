@@ -22,15 +22,16 @@ using Bookify.Domain.Model;
 using Application.Authors.Queries.GetAuthorById;
 using Application.Books.Queries.GetBookById;
 using ConsolePresentation;
+using System.Configuration;
+using FluentAssertions.Common;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 
 internal class Program
 {
     private static async Task Main(string[] args)
     {
-        var context = new DataContext();
-        context.Database.EnsureDeleted();
-        context.Database.EnsureCreated();
-        Seeder.SeedData(context);
+        
     }
     
 }

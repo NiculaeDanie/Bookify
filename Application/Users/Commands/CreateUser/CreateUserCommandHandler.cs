@@ -12,27 +12,26 @@ namespace Application.Users.Commands.CreateUser
 {
     public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, User>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        public CreateUserCommandHandler(IUnitOfWork unitOfWork)
+        private readonly IUserRepository _unitOfWork;
+        public CreateUserCommandHandler(IUserRepository unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
         public async Task<User> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
-            var ex = await _unitOfWork.UserRepository.VerifyEmail(request.Email);
-            if (ex)
+            var ex = await _unitOfWork.GetByName(request.Name);
+            if (ex != null)
             {
                 return null;
             }
             var user = new User
             {
-                Name = request.Name,
                 Email = request.Email,
-                Password = request.Password
+                SecurityStamp = Guid.NewGuid().ToString(),
+                UserName = request.Name
             };
-            await _unitOfWork.UserRepository.Add(user);
-            await _unitOfWork.Save();
+            await _unitOfWork.CreateUser(user,request.Password);
             return user;
         }
     }

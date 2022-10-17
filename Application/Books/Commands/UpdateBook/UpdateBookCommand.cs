@@ -15,6 +15,7 @@ namespace Application.Books.Commands.UpdateBook
         public string Title { get; set; }
         public DateTime Created { get; set; }
         public string Description { get; set; }
-        public IFormFile Content { get; set; }
+        public IFormFile? Content { get; set; }
+        public IFormFile? Image { get; set; }
     }
 }

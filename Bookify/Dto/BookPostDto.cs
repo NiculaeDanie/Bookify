@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+
 namespace Bookify.Dto
 {
-    public class BookPutPostDto
+    public class BookPostDto
     {
         [Required]
         [MinLength(1)]
@@ -14,9 +14,8 @@ namespace Bookify.Dto
         [Required]
         public string Description { get; set; }
 
-        [Required]
         public IFormFile Content { get; set; }
-        [Required]
+        
         public IFormFile Image { get; set; }
     }
 }

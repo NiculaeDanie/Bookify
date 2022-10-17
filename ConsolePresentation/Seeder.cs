@@ -134,9 +134,7 @@ namespace ConsolePresentation
                     .RuleFor(book => book.Title, bookName)
                     .RuleFor(book => book.Description, (_, book) => book.Title.ToUpper())
                     .RuleFor(book => book.ReleaseDate, DateTime.Now)
-                    .RuleFor(book => book.Content, content)
                     .RuleFor(book => book.Status, (Status)0)
-                    .RuleFor(book => book.ImageUrl, "https://play-lh.googleusercontent.com/_tslXR7zUXgzpiZI9t70ywHqWAxwMi8LLSfx8Ab4Mq4NUTHMjFNxVMwTM1G0Q-XNU80")
                     .RuleFor(book => book.ViewCount, 0)
                     .Generate()).ToList();
             

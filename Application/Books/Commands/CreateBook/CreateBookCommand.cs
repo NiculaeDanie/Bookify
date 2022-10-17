@@ -16,6 +16,6 @@ namespace Application.Books.Commands.CreateBook
         public string Description { get; set; }
         public DateTime ReleaseDate { get; set; }
         public IFormFile Content { get; set; }
-        public string ImageUrl { get; set; }
+        public IFormFile Image { get; set; }
     }
 }

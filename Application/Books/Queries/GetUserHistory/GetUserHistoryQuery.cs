@@ -10,6 +10,6 @@ namespace Application.Users.Queries.GetUserHistory
 {
     public class GetUserHistoryQuery: IRequest<List<Book>>
     {
-        public int UserId { get; set; }
+        public string UserId { get; set; }
     }
 }

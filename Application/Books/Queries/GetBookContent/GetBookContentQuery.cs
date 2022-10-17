@@ -1,4 +1,5 @@
 ﻿
+using Application.Abstract;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace Application.Users.Queries.GetBookContent
 {
-    public class GetBookContentQuery: IRequest<byte[]>
+    public class GetBookContentQuery: IRequest<BlobDto>
     {
         public int BookId { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
     }
 }

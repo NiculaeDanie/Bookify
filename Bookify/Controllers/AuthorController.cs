@@ -12,6 +12,7 @@ using Bookify.Domain.Model;
 using Bookify.Dto;
 using Bookify.Middleware;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.EventSource;
 
@@ -59,7 +60,7 @@ namespace Bookify.Controllers
 
         // POST api/<AuthorController>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] AuthorPutPostDto value)
+        public async Task<IActionResult> Post([FromForm] AuthorPutPostDto value)
         {
             _logger.LogInformation(LogEvents.InsertItem,"Post Author {name},{description}",value.Name,value.Description);
             if (!ModelState.IsValid)

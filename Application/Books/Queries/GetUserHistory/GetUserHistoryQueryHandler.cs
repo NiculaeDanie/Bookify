@@ -1,6 +1,7 @@
 ﻿using Application.Abstract;
 using Bookify.Domain.Model;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,17 +14,19 @@ namespace Application.Users.Queries.GetUserHistory
     public class GetUserHistoryQueryHandler : IRequestHandler<GetUserHistoryQuery, List<Book>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        public GetUserHistoryQueryHandler(IUnitOfWork unitOfWork)
+        private readonly UserManager<User> userManager;
+        public GetUserHistoryQueryHandler(IUnitOfWork unitOfWork, UserManager<User> userManager)
         {
             _unitOfWork = unitOfWork;
+            this.userManager = userManager;
         }
 
         public async Task<List<Book>> Handle(GetUserHistoryQuery request, CancellationToken cancellationToken)
         {
-            var user = await _unitOfWork.UserRepository.GetById(request.UserId);
+            var user = await userManager.FindByEmailAsync(request.UserId);
             if (user == null)
                 return null;
-            return await _unitOfWork.UserRepository.GetUserHistory(request.UserId);
+            return await _unitOfWork.BookRepository.GetHistory(user.Id);
         }
     }
 }

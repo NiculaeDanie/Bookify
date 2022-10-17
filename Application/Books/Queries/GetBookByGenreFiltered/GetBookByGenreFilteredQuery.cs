@@ -11,6 +11,6 @@ namespace Application.Books.Queries.GetBookByGenreFiltered
     public class GetBookByGenreFilteredQuery: IRequest<List<Book>>
     {
         public int GenreId { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
     }
 }

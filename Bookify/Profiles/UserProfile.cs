@@ -10,7 +10,7 @@ namespace Bookify.Profiles
         public UserProfile()
         {
             CreateMap<UserPutPostDto, User>();
-            CreateMap<User, UserGetDto>();
+            CreateMap<User, LoginDto>();
         }
     }
 }

@@ -1,28 +1,15 @@
 ﻿
 
 using Domain;
+using Microsoft.AspNetCore.Identity;
 
 namespace Bookify.Domain.Model
 {
-    public class User
+    public class User: IdentityUser
     {
-        public int Id { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string Name { get; set; }
         public ICollection<UserBook> UserBook { get; set; }
         public ICollection<UserFavorites> UserFavorites { get; set; }
 
-        public User()
-        {
-
-        }
-        public User(string email, string password, string name)
-        {
-            this.Email = email;
-            this.Password = password;
-            this.Name = name;
-        }
         public List<Genre> GetUserPreferences()
         {
             List<Genre> genre = new List<Genre>();
