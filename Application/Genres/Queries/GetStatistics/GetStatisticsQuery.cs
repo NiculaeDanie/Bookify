@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Application.Genres.Queries.GetStatistics
 {
-    public class GetStatisticsQuery: IRequest<Dictionary<Genre,int>>
+    public class GetStatisticsQuery: IRequest<Dictionary<string,int>>
     {
     }
 }

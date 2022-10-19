@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application.Genres.Queries.GetStatistics
 {
-    public class GetStatisticsQueryHandler: IRequestHandler<GetStatisticsQuery,Dictionary<Genre,int>>
+    public class GetStatisticsQueryHandler: IRequestHandler<GetStatisticsQuery,Dictionary<string,int>>
     {
         private readonly IUnitOfWork _unitOfWork;
         public GetStatisticsQueryHandler(IUnitOfWork unitOfWork)
@@ -17,9 +17,9 @@ namespace Application.Genres.Queries.GetStatistics
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Dictionary<Genre, int>> Handle(GetStatisticsQuery request, CancellationToken cancellationToken)
+        public async Task<Dictionary<string, int>> Handle(GetStatisticsQuery request, CancellationToken cancellationToken)
         {
-            var response = new Dictionary<Genre, int>();
+            var response = new Dictionary<string, int>();
             var books = await _unitOfWork.BookRepository.GetFullHistory();
             foreach (var book in books)
             {
@@ -27,9 +27,9 @@ namespace Application.Genres.Queries.GetStatistics
                 {
                     foreach (var genre in book.BookGenre)
                     {
-                        if (!response.ContainsKey(genre.Genre))
-                            response[genre.Genre] = 0;
-                        response[genre.Genre]++;
+                        if (!response.ContainsKey(genre.Genre.Name))
+                            response[genre.Genre.Name] = 0;
+                        response[genre.Genre.Name]++;
                     }
                 }
             }

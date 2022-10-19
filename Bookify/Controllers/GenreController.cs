@@ -1,8 +1,10 @@
 ﻿
+using Application.Books.Queries.Statistics;
 using Application.Genres.Commands.CreateGenre;
 using Application.Genres.Commands.DeleteGenre;
 using Application.Genres.Queries.GetGenreById;
 using Application.Genres.Queries.GetGenreList;
+using Application.Genres.Queries.GetStatistics;
 using AutoMapper;
 using Bookify.Domain.Model;
 using Bookify.Dto;
@@ -38,6 +40,24 @@ namespace Bookify.Controllers
             var mappedResult = _mapper.Map<List<GenreGetDto>>(result);
             return Ok(mappedResult);
         }
+        [HttpGet("User/{email}")]
+        public async Task<IActionResult> GetUser(string email)
+        {
+            _logger.LogInformation(LogEvents.ListItems, "Get all Genres");
+            var result = await _mediator.Send(new GetGenreListUserQuery()
+            {
+                UserId = email
+            });
+            var mappedResult = _mapper.Map<List<GenreGetDto>>(result);
+            return Ok(mappedResult);
+        }
+
+        [HttpGet("Statistics")]
+        public async Task<IActionResult> GetStatistics()
+        {
+            var result = await _mediator.Send(new GetStatisticsQuery());
+            return Ok(result);
+        }
 
         // GET api/<GenreController>/5
         [HttpGet("{id}")]
@@ -55,6 +75,13 @@ namespace Bookify.Controllers
             }
             var mappedResult = _mapper.Map<GenreGetDto>(result);
             return Ok(mappedResult);
+        }
+
+        [HttpGet("TopUsers")]
+        public async Task<IActionResult> GetTop(int id)
+        {
+            var result = await _mediator.Send(new TopUsersQuery());
+            return Ok(result);
         }
 
         // POST api/<GenreController>

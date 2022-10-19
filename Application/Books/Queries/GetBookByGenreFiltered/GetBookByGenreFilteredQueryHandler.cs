@@ -12,6 +12,7 @@ namespace Application.Books.Queries.GetBookByGenreFiltered
     public class GetBookByGenreFilteredQueryHandler:IRequestHandler<GetBookByGenreFilteredQuery,List<Book>>
     {
         private readonly IUnitOfWork _unitOfWork;
+
         public GetBookByGenreFilteredQueryHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork=unitOfWork;
